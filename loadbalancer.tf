@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "amc-marketplacegcp-nonprod"
-name = "testjs2"
-region = "europe-west2"
-availability_zones = [
-  "europe-west2-a",
-  "europe-west2-b",
-]
-
-es_image_project = "amc-marketplacegcp-nonprod"
-es_image_name = "ed70test4"
-ad_image_name = "adlds2"
-escount = 2
-vm_machine_type = "e2-micro"
-
-storage_setup_folder = "gs://jsbucket1/folder1"
-storage_license_path = "gs://jsbucket1/folder1/Enterprise-Developer-UNIX-components(PA).mflic"
-
-
-
-ssh_ip = "146.200.27.215"
+module "load_balancer" {
+  source       = "GoogleCloudPlatform/lb/google"
+  version      = "~> 2.0.0"
+  region       = var.region
+  name         = "${var.name}-loadbalancer"
+  service_port = 5557
+  target_tags  = ["allow-lb-service"]
+  network      = google_compute_network.vpc.self_link
+}

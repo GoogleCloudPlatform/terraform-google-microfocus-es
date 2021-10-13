@@ -32,9 +32,22 @@ module "private-service-access" {
   depends_on = [google_compute_network.vpc]
 }
 
-#lock ESCWA and ES access to source IP
-resource "google_compute_firewall" "default" {
+#lock ESCWA and TN3270 to source IP
+resource "google_compute_firewall" "escwa" {
   name    = "${var.name}-firewall-rule-escwa"
+  network = google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["10086", "5557"]
+  }
+  
+  source_ranges=[var.ssh_ip]
+}
+
+#access to mfds, escwa and comms processes between ES instances and ESCWA instance
+resource "google_compute_firewall" "esserver" {
+  name    = "${var.name}-firewall-rule-esserver"
   network = google_compute_network.vpc.name
 
   allow {
@@ -43,12 +56,10 @@ resource "google_compute_firewall" "default" {
 
   allow {
     protocol = "tcp"
-    ports    = ["1086", "10086", "5557"]
+    ports    = ["1086", "10086", "5500-5600"]
   }
   
-  source_ranges=[var.ssh_ip]
-  
-  #or to es instances
+  #ES instances or load balancer
   source_tags = ["es", "allow-lb-service"]
 }
 

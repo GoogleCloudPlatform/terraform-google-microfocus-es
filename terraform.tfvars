@@ -20,15 +20,13 @@ availability_zones = [
   "europe-west2-b",
 ]
 
-es_image_project = "amc-marketplacegcp-nonprod"
-es_image_name = "ed70test4"
-ad_image_name = "adlds2"
+es_image_project = "artful-reef-327010"
+es_image_name = "es70bankdemo"
+ad_image_name = "adbankdemo"
 escount = 2
-vm_machine_type = "e2-micro"
+vm_machine_type = "e2-standard-4"
 
 storage_setup_folder = "gs://jsbucket1/folder1"
-storage_license_path = "gs://jsbucket1/folder1/Enterprise-Developer-UNIX-components(PA).mflic"
-
-
+storage_license_path = "gs://jsbucket1/folder1/license.mflic"
 
 ssh_ip = "146.200.27.215"

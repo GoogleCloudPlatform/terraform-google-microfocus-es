@@ -29,4 +29,27 @@ export LOCAL_IP="$(curl http://metadata.google.internal/computeMetadata/v1/insta
 
 curl -X PUT --data "in-progress" http://metadata.google.internal/computeMetadata/v1/instance/guest-attributes/blueprint/install -H "Metadata-Flavor: Google"
 
-#Installation steps...
+usernameFull=demouser
+
+echo "Downloading setup scripts"
+gsutil cp "${BUCKET_URL}/*" .
+chmod u+x *.sh
+
+./install-license.sh "${LICENSE_FILENAME}"
+./start-mfds.sh $usernameFull
+./install-odbc-dsns.sh ${SQL_HOST}
+./start-escwa.sh $usernameFull
+
+yum install -y python3
+python3 -m pip install requests
+python3 createpac.py "http://localhost:10086" ${REDIS_HOST} ${REGION} ${CLUSTER_PREFIX}-es-mig
+
+./import-region-bankdemo.sh $usernameFull BankDemo_PAC.zip /home/$usernameFull
+export MFDBFH_CONFIG=/home/$usernameFull/BankDemo_PAC/System/MFDBFH.cfg
+./create-mfdbfh-config.sh $MFDBFH_CONFIG ${SQL_USERNAME} ${SQL_PASSWORD}
+./deploy-datafiles.sh /home/$usernameFull
+service firewalld stop
+
+#configure ESCWA to secure against active directory
+#empty username uses default CN=MFReader,CN=ADAM Users,CN=Micro Focus,CN=Program Data,DC=local
+python3 secure-escwa.py http://localhost:10086 ${AD_HOST} "" "mf_rdr7_3_1"

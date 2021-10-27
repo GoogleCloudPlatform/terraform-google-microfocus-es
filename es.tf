@@ -18,7 +18,7 @@ module "instance_template" {
   project_id      = var.project_id
   name_prefix     = "esvm"
   service_account = var.vm_service_account
-  subnetwork      = google_compute_subnetwork.vpc_subnetwork.name
+  subnetwork      = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
   machine_type    = var.vm_machine_type
 
   //ED7.0 image
@@ -28,11 +28,7 @@ module "instance_template" {
   auto_delete = true
   
   metadata = {
-    startup-script-url = "${var.storage_setup_folder}/Configure-ES-Node.sh"
-    setup-folder = var.storage_setup_folder
-    license-file = var.storage_license_path
-    redishost = module.memcache.host
-    sqlhost = module.sql-db.private_ip_address
+    startup-script = data.template_file.es_startup_script.rendered
   }
   
   #Empty access_config causes an external IP to be auto-assigned
@@ -40,7 +36,7 @@ module "instance_template" {
     nat_ip=""
     network_tier="STANDARD"
   }]
-
+  depends_on = [null_resource.upload_folder_content]
   tags=["es"]
 }
 

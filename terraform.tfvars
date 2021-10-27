@@ -13,12 +13,14 @@
 # limitations under the License.
 
 project_id = "amc-marketplacegcp-nonprod"
-name = "testjs2"
+name = "env9"
 region = "europe-west2"
 availability_zones = [
   "europe-west2-a",
   "europe-west2-b",
 ]
+
+bucketname = "jsbucket111"
 
 es_image_project = "artful-reef-327010"
 es_image_name = "es70bankdemo"
@@ -26,7 +28,9 @@ ad_image_name = "adbankdemo"
 escount = 2
 vm_machine_type = "e2-standard-4"
 
-storage_setup_folder = "gs://jsbucket1/folder1"
-storage_license_path = "gs://jsbucket1/folder1/license.mflic"
+pg_db_username = "DBadmin2"
+pg_db_password = "aaaabbbb"
 
-ssh_ip = "146.200.27.215"
+license_filename = "Enterprise-Server-(Production)(PA).mflic"
+
+ssh_ip = "150.143.20.224"

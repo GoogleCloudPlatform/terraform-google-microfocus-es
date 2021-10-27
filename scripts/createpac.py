@@ -12,7 +12,6 @@ instanceGroupName = sys.argv[4] #"testjs6-es-mig"
 
 def runcmd(cmd):
   output = Popen(args=cmd,stdout=PIPE,shell=True).communicate()[0].decode('ascii')
-  #obj = json.loads(output)
   return output;
   
 def getInstancesInInstanceGroup(region, instanceGroupName):

@@ -13,30 +13,31 @@
 # limitations under the License.
 
 resource "google_compute_network" "vpc" {
+  count                   = var.create_network ? 1 : 0
   name                    = "${var.name}-vpc"
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "vpc_subnetwork" {
+  count                    = var.create_network ? 1 : 0
   name                     = "${var.name}-subnetwork"
-  ip_cidr_range            = "10.2.0.0/16"
+  ip_cidr_range            = "${var.vpc_subnet_cidr}"
   region                   = var.region
-  network                  = google_compute_network.vpc.id
+  network                  = google_compute_network.vpc[0].id
   private_ip_google_access = true
 }
 
 module "private-service-access" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/private_service_access"
   project_id  = var.project_id
-  vpc_network = google_compute_network.vpc.name
+  vpc_network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
   depends_on = [google_compute_network.vpc]
 }
 
 #lock ESCWA and TN3270 to source IP
 resource "google_compute_firewall" "escwa" {
   name    = "${var.name}-firewall-rule-escwa"
-  network = google_compute_network.vpc.name
-
+  network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
   allow {
     protocol = "tcp"
     ports    = ["10086", "5557"]
@@ -48,7 +49,7 @@ resource "google_compute_firewall" "escwa" {
 #access to mfds, escwa and comms processes between ES instances and ESCWA instance
 resource "google_compute_firewall" "esserver" {
   name    = "${var.name}-firewall-rule-esserver"
-  network = google_compute_network.vpc.name
+  network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
 
   allow {
     protocol = "icmp"
@@ -65,7 +66,7 @@ resource "google_compute_firewall" "esserver" {
 
 resource "google_compute_firewall" "ssh" {
   name    = "${var.name}-firewall-rule-ssh"
-  network = google_compute_network.vpc.name
+  network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
 
   allow {
     protocol = "tcp"
@@ -75,7 +76,7 @@ resource "google_compute_firewall" "ssh" {
 
 resource "google_compute_firewall" "activedirectory" {
   name    = "${var.name}-firewall-rule-activedirectory"
-  network = google_compute_network.vpc.name
+  network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
 
   allow {
     protocol = "tcp"

@@ -27,3 +27,35 @@ provider "google" {
   region  = var.region
   zone    = var.availability_zones[0]
 }
+
+data "template_file" "es_startup_script" {
+  template = file(format("${path.module}/templates/startup_script_es.sh.tpl"))
+  vars = {
+    LICENSE_FILENAME  = var.license_filename
+    BUCKET_URL        = module.storage.bucket.url
+    SQL_HOST          = module.sql-db.private_ip_address
+    SQL_USERNAME      = var.pg_db_username
+    SQL_PASSWORD      = var.pg_db_password
+  }
+    
+  depends_on = [
+  ]
+}
+
+data "template_file" "escwa_startup_script" {
+  template = file(format("${path.module}/templates/startup_script_escwa.sh.tpl"))
+  vars = {
+    LICENSE_FILENAME  = var.license_filename
+    BUCKET_URL        = module.storage.bucket.url
+    REDIS_HOST        = module.memcache.host
+    SQL_HOST          = module.sql-db.private_ip_address
+    SQL_USERNAME      = var.pg_db_username
+    SQL_PASSWORD      = var.pg_db_password
+    AD_HOST           = "${var.name}-activedirectory-001"
+    CLUSTER_PREFIX    = var.name
+    REGION            = var.region
+  }
+    
+  depends_on = [
+  ]
+}

@@ -23,56 +23,27 @@ module "sql-db" {
   region = var.region
   zone = var.availability_zones[0]
   deletion_protection = false
-  tier = "db-f1-micro"
+  tier = var.pg_db_size
   disk_autoresize  = false
   disk_size        = 100
   disk_type        = "PD_HDD"
   db_name      = var.pg_db_name
   db_charset   = "UTF8"
   db_collation = "en_US.UTF8"
-  user_name = "mfdbfh"
-  user_password = "a3db429bd0bb"
+  user_name = var.pg_db_username
+  user_password = var.pg_db_password
   database_flags = [{ name  = "max_connections", value = "10000" }]
   ip_configuration = {
     ipv4_enabled    = false
     require_ssl     = false
-    private_network = google_compute_network.vpc.id
+    private_network = var.create_network ? google_compute_network.vpc[0].id : var.vpc_network
       authorized_networks = [
       {
-        name  = google_compute_network.vpc.name
+        name  = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
         value = var.pg_ha_external_ip_range
       },
     ]
   }
-
-  read_replica_name_suffix = "-replica"
-  read_replicas = [
-    {
-      name             = "0"
-      zone             = var.availability_zones[1]
-      tier             = "db-f1-micro"
-
-      ip_configuration = {
-        ipv4_enabled    = false
-        require_ssl     = false
-        private_network = google_compute_network.vpc.id
-        authorized_networks = [
-        {
-          name  = google_compute_network.vpc.name
-          value = var.pg_ha_external_ip_range
-        },
-        ]
-      } 
-      
-      database_flags   = [{ name = "autovacuum", value = "off" }, { name  = "max_connections", value = "10000" }]
-      disk_autoresize  = false
-      disk_size        = 100
-      disk_type        = "PD_HDD"
-      user_labels      = { bar = "baz" }
-    },
-  ]
-  
-  
   backup_configuration = {
     enabled                        = true
     start_time                     = "00:55"

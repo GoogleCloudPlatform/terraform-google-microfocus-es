@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  vpc_name = "${var.name}-vpc"
+  subnet_name = "${var.name}-subnet"
+}
+
 variable "project_id" {
   description = "The project to deploy the environment into"
   type        = string
@@ -19,6 +24,33 @@ variable "project_id" {
 
 variable "name" {
   description = "The prefix to use for created resources"
+  type        = string
+  default     = null
+}
+
+variable "create_network" {
+  description = "Create Network (true or false)"
+  type = bool
+  default = true
+}
+
+variable "vpc_network" {
+  description = "Network to attach nodes to"
+  default = "vpc-network"
+}
+
+variable "vpc_subnet" {
+  description = "Subnet to attach nodes to"
+  default = "vpc-subnet"
+}
+
+variable "vpc_subnet_cidr" {
+  description = "Subnet CIDR to attach nodes to"
+  default = "10.2.0.0/16"
+}
+
+variable "bucketname" {
+  description = "Name of the bucket to create to upload scripts and the license file to"
   type        = string
   default     = null
 }
@@ -65,16 +97,10 @@ variable "escount" {
   default = 2
 }
 
-variable "storage_license_path" {
-  description = "Path of Enterprise Server license file"
+variable "license_filename" {
+  description = "Name of the Enterprise Server license file that has been placed in the eslicense folder"
   type    = string
-  default = "gs://bucketname/folder/Enterprise-Developer-UNIX.mflic"
-}
-
-variable "storage_setup_folder" {
-  description = "Path of storage folder containing setup scripts"
-  type    = string
-  default = "gs://bucketname/folder/scripts"
+  default = "Enterprise-Developer-UNIX.mflic"
 }
 
 variable "es_image_project" {
@@ -103,7 +129,26 @@ variable "ssh_ip" {
 
 variable "pg_db_name" {
   type    = string
+  description = "Name to give the created postgresql database"
   default = "postgresql"
+}
+
+variable "pg_db_size" {
+  type    = string
+  description = "Size of the created postgresql database"
+  default = "db-f1-micro"
+}
+
+variable "pg_db_username" {
+  description = "Name of the postgresql database user to create"
+  type        = string
+  default     = null
+}
+
+variable "pg_db_password" {
+  description = "Password that will be set for the created postgresql database user"
+  type        = string
+  default     = null
 }
 
 variable "pg_ha_external_ip_range" {

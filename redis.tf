@@ -17,7 +17,7 @@ module "memcache" {
   version = "3.0.0"
   name = "${var.name}-redis"
   project = var.project_id
-  authorized_network = google_compute_network.vpc.name
+  authorized_network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
   redis_version     = "REDIS_5_0"
   memory_size_gb = var.redis_memory_size_gb
   enable_apis    = true

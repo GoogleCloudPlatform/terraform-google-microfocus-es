@@ -16,9 +16,9 @@ module "activedirectory_instance_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
   version = "6.5.0"
   project_id      = var.project_id
-  name_prefix     = "adtivedirectory"
+  name_prefix     = "activedirectory"
   service_account = var.vm_service_account
-  subnetwork      = google_compute_subnetwork.vpc_subnetwork.name
+  subnetwork      = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
   machine_type    = "e2-small"
   
   //ED7.0 image
@@ -33,7 +33,7 @@ module "activedirectory_compute_instance" {
   source            = "terraform-google-modules/vm/google//modules/compute_instance"
   region            = var.region
   zone              = var.availability_zones[0]
-  subnetwork        = google_compute_subnetwork.vpc_subnetwork.name
+  subnetwork        = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
   num_instances     = 1
   hostname          = "${var.name}-activedirectory"
   instance_template = module.activedirectory_instance_template.self_link

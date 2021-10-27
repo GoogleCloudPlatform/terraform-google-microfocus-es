@@ -19,5 +19,5 @@ module "load_balancer" {
   name         = "${var.name}-loadbalancer"
   service_port = 5557
   target_tags  = ["allow-lb-service"]
-  network      = google_compute_network.vpc.self_link
+  network      = var.create_network ? google_compute_network.vpc[0].self_link : var.vpc_network
 }

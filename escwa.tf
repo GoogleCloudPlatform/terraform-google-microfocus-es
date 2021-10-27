@@ -18,7 +18,7 @@ module "escwa_instance_template" {
   project_id      = var.project_id
   name_prefix     = "escwa"
   service_account = var.vm_service_account
-  subnetwork      = google_compute_subnetwork.vpc_subnetwork.name
+  subnetwork      = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
   machine_type    = var.vm_machine_type
   
   //ED7.0 image
@@ -28,27 +28,18 @@ module "escwa_instance_template" {
   auto_delete = true
   
   metadata = {
-     startup-script-url = "${var.storage_setup_folder}/Configure-ESCWA-Node.sh" //"gs://bucket/folder/Configure-ESCWA-Node.sh"
-     shutdown-script = "/drop-vsam-db.sh"
-     setup-folder = var.storage_setup_folder
-     license-file = var.storage_license_path                               //"gs://bucket/folder/license.mflic"
-     redishost = module.memcache.host
-     sqlhost = module.sql-db.private_ip_address
-     escount = var.escount
-     clusterPrefix = var.name
-     region = var.region
-     activedirectoryhost = "${var.name}-activedirectory-001"
+    startup-script = data.template_file.escwa_startup_script.rendered
   }
   
   tags=["es"]
-  depends_on = [module.activedirectory_compute_instance]
+  depends_on = [module.activedirectory_compute_instance, null_resource.upload_folder_content]
 }
 
 module "compute_instance" {
   source            = "terraform-google-modules/vm/google//modules/compute_instance"
   region            = var.region
   zone              = var.availability_zones[0]
-  subnetwork        = google_compute_subnetwork.vpc_subnetwork.name
+  subnetwork        = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
   num_instances     = 1
   hostname          = "${var.name}-escwa"
   instance_template = module.escwa_instance_template.self_link

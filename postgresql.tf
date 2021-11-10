@@ -34,7 +34,7 @@ module "sql-db" {
   user_password = var.pg_db_password
   database_flags = [{ name  = "max_connections", value = "10000" }]
   ip_configuration = {
-    ipv4_enabled    = false
+    ipv4_enabled    = true
     require_ssl     = false
     private_network = var.create_network ? google_compute_network.vpc[0].id : var.vpc_network
       authorized_networks = [
@@ -42,6 +42,10 @@ module "sql-db" {
         name  = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
         value = var.pg_ha_external_ip_range
       },
+      {
+        name  = "ip-cidr"
+        value = var.ssh_ip
+      }
     ]
   }
   backup_configuration = {

@@ -40,9 +40,10 @@ usernameFull=demouser
 ./install-license.sh "${LICENSE_FILENAME}"
 ./start-mfds.sh $usernameFull
 ./import-region-bankdemo.sh $usernameFull BankDemo_PAC.zip /home/$usernameFull
+./setup-cloudsql-proxy.sh "${SQL_CONNECTION}"
 export MFDBFH_CONFIG=/home/$usernameFull/BankDemo_PAC/System/MFDBFH.cfg
 ./create-mfdbfh-config.sh $MFDBFH_CONFIG ${SQL_USERNAME} ${SQL_PASSWORD}
-./install-odbc-dsns.sh ${SQL_HOST}
+./install-odbc-dsns.sh
 ./start-escwa.sh $usernameFull
 ./escwa-login.sh
 ./escwa-delete-default-directoryserver.sh

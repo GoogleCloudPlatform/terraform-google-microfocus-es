@@ -33,6 +33,7 @@ data "template_file" "es_startup_script" {
   vars = {
     LICENSE_FILENAME  = var.license_filename
     BUCKET_URL        = module.storage.bucket.url
+    SQL_CONNECTION    = module.sql-db.instance_connection_name
     SQL_HOST          = module.sql-db.private_ip_address
     SQL_USERNAME      = var.pg_db_username
     SQL_PASSWORD      = var.pg_db_password
@@ -48,6 +49,7 @@ data "template_file" "escwa_startup_script" {
     LICENSE_FILENAME  = var.license_filename
     BUCKET_URL        = module.storage.bucket.url
     REDIS_HOST        = module.memcache.host
+    SQL_CONNECTION    = module.sql-db.instance_connection_name
     SQL_HOST          = module.sql-db.private_ip_address
     SQL_USERNAME      = var.pg_db_username
     SQL_PASSWORD      = var.pg_db_password

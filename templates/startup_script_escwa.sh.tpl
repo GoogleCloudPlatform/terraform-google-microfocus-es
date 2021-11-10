@@ -37,7 +37,7 @@ chmod u+x *.sh
 
 ./install-license.sh "${LICENSE_FILENAME}"
 ./start-mfds.sh $usernameFull
-./install-odbc-dsns.sh ${SQL_HOST}
+./install-odbc-dsns.sh
 ./start-escwa.sh $usernameFull
 
 yum install -y python3
@@ -45,6 +45,7 @@ python3 -m pip install requests
 python3 createpac.py "http://localhost:10086" ${REDIS_HOST} ${REGION} ${CLUSTER_PREFIX}-es-mig
 
 ./import-region-bankdemo.sh $usernameFull BankDemo_PAC.zip /home/$usernameFull
+./setup-cloudsql-proxy.sh "${SQL_CONNECTION}"
 export MFDBFH_CONFIG=/home/$usernameFull/BankDemo_PAC/System/MFDBFH.cfg
 ./create-mfdbfh-config.sh $MFDBFH_CONFIG ${SQL_USERNAME} ${SQL_PASSWORD}
 ./deploy-datafiles.sh /home/$usernameFull

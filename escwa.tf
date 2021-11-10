@@ -31,7 +31,7 @@ module "escwa_instance_template" {
     startup-script = data.template_file.escwa_startup_script.rendered
   }
   
-  tags=["es"]
+  tags=["escwa"]
   depends_on = [module.activedirectory_compute_instance, null_resource.upload_folder_content]
 }
 

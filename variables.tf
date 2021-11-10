@@ -36,16 +36,19 @@ variable "create_network" {
 
 variable "vpc_network" {
   description = "Network to attach nodes to"
+  type        = string
   default = "vpc-network"
 }
 
 variable "vpc_subnet" {
   description = "Subnet to attach nodes to"
+  type        = string
   default = "vpc-subnet"
 }
 
 variable "vpc_subnet_cidr" {
   description = "Subnet CIDR to attach nodes to"
+  type        = string
   default = "10.2.0.0/16"
 }
 

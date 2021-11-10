@@ -33,21 +33,7 @@ module "sql-db" {
   user_name = var.pg_db_username
   user_password = var.pg_db_password
   database_flags = [{ name  = "max_connections", value = "10000" }]
-  ip_configuration = {
-    ipv4_enabled    = true
-    require_ssl     = false
-    private_network = var.create_network ? google_compute_network.vpc[0].id : var.vpc_network
-      authorized_networks = [
-      {
-        name  = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
-        value = var.pg_ha_external_ip_range
-      },
-      {
-        name  = "ip-cidr"
-        value = var.ssh_ip
-      }
-    ]
-  }
+
   backup_configuration = {
     enabled                        = true
     start_time                     = "00:55"
@@ -57,8 +43,4 @@ module "sql-db" {
     retained_backups               = 365
     retention_unit                 = "COUNT"
   }
-  
-  depends_on = [
-    module.private-service-access.peering_completed,
-  ]
 }

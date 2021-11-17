@@ -43,7 +43,7 @@ resource "google_compute_firewall" "ssh" {
     protocol = "tcp"
     ports    = ["22","3389"]
   }
-  source_tags = ["es", "escwa"]
+  source_ranges=["0.0.0.0/0"]
 }
 
 resource "google_compute_firewall" "activedirectory" {

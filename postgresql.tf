@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  read_replica_ip_configuration = {
+    ipv4_enabled    = true
+    require_ssl     = false
+    private_network = null
+    authorized_networks = []
+  }
+}
+
 module "sql-db" {
   source  = "GoogleCloudPlatform/sql-db/google//modules/postgresql"
   version = "6.0.0"
@@ -33,6 +42,21 @@ module "sql-db" {
   user_name = var.pg_db_username
   user_password = var.pg_db_password
   database_flags = [{ name  = "max_connections", value = "10000" }]
+
+  read_replica_name_suffix = "-replica"
+  read_replicas = [
+    {
+      name             = "0"
+      zone             = var.availability_zones[1]
+      tier             = var.pg_db_size
+      ip_configuration = local.read_replica_ip_configuration
+      database_flags   = [{ name = "autovacuum", value = "off" }, { name  = "max_connections", value = "10000" }]
+      disk_autoresize  = false
+      disk_size        = 100
+      disk_type        = "PD_HDD"
+      user_labels      = { bar = "baz" }
+    },
+  ]
 
   backup_configuration = {
     enabled                        = true

@@ -22,4 +22,7 @@ module "memcache" {
   memory_size_gb = var.redis_memory_size_gb
   enable_apis    = true
   region = var.region
+  tier  = "STANDARD_HA"
+  location_id  = var.availability_zones[0]
+  alternative_location_id  = var.availability_zones[1]
 }

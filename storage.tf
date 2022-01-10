@@ -1,6 +1,6 @@
 module "storage" {
   source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
-  version = "~> 1.3"
+  version = ">= 3.1.0"
   name       = var.bucketname
   project_id = var.project_id
   location   = var.region
@@ -16,6 +16,6 @@ resource "null_resource" "upload_folder_content" {
 
 resource "null_resource" "upload_license" {
   provisioner "local-exec" {
-    command = "gsutil cp -r eslicense/${var.license_filename} ${module.storage.bucket.url}"
+    command = "gsutil cp -r eslicense/* ${module.storage.bucket.url}"
   }
 }

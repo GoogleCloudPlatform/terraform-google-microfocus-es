@@ -36,19 +36,16 @@ variable "create_network" {
 
 variable "vpc_network" {
   description = "Network to attach nodes to"
-  type        = string
   default = "vpc-network"
 }
 
 variable "vpc_subnet" {
   description = "Subnet to attach nodes to"
-  type        = string
   default = "vpc-subnet"
 }
 
 variable "vpc_subnet_cidr" {
   description = "Subnet CIDR to attach nodes to"
-  type        = string
   default = "10.2.0.0/16"
 }
 
@@ -85,7 +82,7 @@ variable "vm_service_account" {
 variable "redis_memory_size_gb" {
   description = "Redis memory size in GiB. Defaulted to 1 GiB"
   type        = number
-  default     = 1
+  default     = 5
 }
 
 variable "vm_machine_type" {
@@ -132,13 +129,13 @@ variable "ssh_ip" {
 
 variable "pg_db_name" {
   type    = string
-  description = "Name to give the created postgresql database"
+  description = "Name to give the postgresql database instance"
   default = "postgresql"
 }
 
 variable "pg_db_size" {
   type    = string
-  description = "Size of the created postgresql database"
+  description = "Size of the postgresql database"
   default = "db-f1-micro"
 }
 

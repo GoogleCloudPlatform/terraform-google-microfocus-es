@@ -1,3 +1,10 @@
+resource "google_project_service" "redis" {
+  project = var.project_id
+  service = "redis.googleapis.com"
+  disable_dependent_services = true
+  disable_on_destroy = false
+}
+
 resource "google_project_service" "sqladmin" {
   project = var.project_id
   service = "sqladmin.googleapis.com"
@@ -18,3 +25,4 @@ resource "google_project_service" "compute" {
   disable_dependent_services = true
   disable_on_destroy = false
 }
+

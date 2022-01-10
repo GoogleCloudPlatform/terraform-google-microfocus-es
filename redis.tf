@@ -12,17 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module "memcache" {
-  source         = "terraform-google-modules/memorystore/google"
-  version = "3.0.0"
-  name = "${var.name}-redis"
-  project = var.project_id
-  authorized_network = var.create_network ? google_compute_network.vpc[0].name : var.vpc_network
-  redis_version     = "REDIS_5_0"
+resource "google_redis_instance" "redis" {
+  name           = "${var.name}-redis"
+  tier           = "STANDARD_HA"
   memory_size_gb = var.redis_memory_size_gb
-  enable_apis    = true
-  region = var.region
-  tier  = "STANDARD_HA"
-  location_id  = var.availability_zones[0]
-  alternative_location_id  = var.availability_zones[1]
+  location_id             = var.availability_zones[0]
+  alternative_location_id = var.availability_zones[1]
+  authorized_network = var.create_network ? module.vpc[0].network_name : var.vpc_network 
+  redis_version     = "REDIS_6_X"
+  display_name      = "${var.name}-redis"
+  replica_count     = 1
+  read_replicas_mode = "READ_REPLICAS_ENABLED"
 }

@@ -14,13 +14,14 @@
 
 module "escwa_instance_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
-  version = "6.5.0"
+  version = ">= 7.3.0"
   project_id      = var.project_id
   name_prefix     = "escwa"
   service_account = var.vm_service_account
-  subnetwork      = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
+  subnetwork = var.create_network ? module.vpc[0].subnets_names[0] : var.vpc_subnet
+  subnetwork_project = var.project_id
   machine_type    = var.vm_machine_type
-  
+  region          = var.region
   //ED7.0 image
   source_image_project = var.es_image_project
   source_image_family = ""
@@ -39,7 +40,8 @@ module "compute_instance" {
   source            = "terraform-google-modules/vm/google//modules/compute_instance"
   region            = var.region
   zone              = var.availability_zones[0]
-  subnetwork        = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
+  subnetwork = var.create_network ? module.vpc[0].subnets_names[0] : var.vpc_subnet
+  subnetwork_project = var.project_id
   num_instances     = 1
   hostname          = "${var.name}-escwa"
   instance_template = module.escwa_instance_template.self_link

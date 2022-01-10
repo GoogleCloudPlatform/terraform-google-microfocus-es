@@ -15,14 +15,13 @@
 terraform {
   required_providers {
     google = {
-      source  = "hashicorp/google"
-      version = "3.70.0"
+      source  = "hashicorp/google-beta"
+      version = "4.5.0"
     }
   }
 }
 
 provider "google" {
-#credentials = file("terraform.json")
   project = var.project_id
   region  = var.region
   zone    = var.availability_zones[0]
@@ -48,7 +47,7 @@ data "template_file" "escwa_startup_script" {
   vars = {
     LICENSE_FILENAME  = var.license_filename
     BUCKET_URL        = module.storage.bucket.url
-    REDIS_HOST        = module.memcache.host
+    REDIS_HOST        = google_redis_instance.redis.host #module.memcache.host
     SQL_CONNECTION    = module.sql-db.instance_connection_name
     SQL_HOST          = module.sql-db.private_ip_address
     SQL_USERNAME      = var.pg_db_username

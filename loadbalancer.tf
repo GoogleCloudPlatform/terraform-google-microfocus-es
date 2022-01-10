@@ -13,11 +13,12 @@
 # limitations under the License.
 
 module "load_balancer" {
+  project      = var.project_id
   source       = "GoogleCloudPlatform/lb/google"
   version      = "~> 2.0.0"
   region       = var.region
   name         = "${var.name}-loadbalancer"
   service_port = 5557
   target_tags  = ["allow-lb-service"]
-  network      = var.create_network ? google_compute_network.vpc[0].self_link : var.vpc_network
+  network      = var.create_network ? module.vpc[0].network_name : var.vpc_network
 }

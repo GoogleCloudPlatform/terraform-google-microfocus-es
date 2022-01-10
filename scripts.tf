@@ -6,7 +6,7 @@
 # Continuously check for HEC token for output
 module "shell_output_token" {
   source = "matti/resource/shell"
-  version = "0.12.0"
+  version = ">= 0.12.0"
   command =  <<CMD
 sleep 10
 until \
@@ -21,7 +21,7 @@ CMD
 # Note, doesn't remove from instance template
 module "shell_output_install_progress" {
   source = "matti/resource/shell"
-  version = "0.12.0"
+  version = ">= 0.12.0"
   command = <<CMD
 sleep 30
 until gcloud compute instances list -q --format="value(name,zone)" --filter="metadata['items']['key']=blueprint-role" | sort |  \

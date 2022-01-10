@@ -14,13 +14,14 @@
 
 module "instance_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
-  version = "6.5.0"
+  version = ">= 7.3.0"
   project_id      = var.project_id
   name_prefix     = "esvm"
   service_account = var.vm_service_account
-  subnetwork      = var.create_network ? google_compute_subnetwork.vpc_subnetwork[0].name : var.vpc_subnet
+  subnetwork = var.create_network ? module.vpc[0].subnets_names[0] : var.vpc_subnet
+  subnetwork_project = var.project_id
   machine_type    = var.vm_machine_type
-
+  region          = var.region
   //ED7.0 image
   source_image_project = var.es_image_project
   source_image_family = ""
@@ -42,7 +43,7 @@ module "instance_template" {
 
 module "mig" {
   source                    = "terraform-google-modules/vm/google//modules/mig"
-  version = "6.5.0"
+  version = ">= 7.3.0"
   instance_template         = module.instance_template.self_link
   region                    = var.region
   project_id                = var.project_id

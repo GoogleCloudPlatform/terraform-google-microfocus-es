@@ -31,6 +31,9 @@ module "sql-db" {
   availability_type = "REGIONAL"
   region = var.region
   zone = var.availability_zones[0]
+  create_timeout = "50m"
+  delete_timeout = "50m"
+  update_timeout = "50m"
   deletion_protection = false
   tier = var.pg_db_size
   disk_autoresize  = false
@@ -54,7 +57,10 @@ module "sql-db" {
       disk_autoresize  = false
       disk_size        = 100
       disk_type        = "PD_HDD"
-      user_labels      = { bar = "baz" }
+      create_timeout = "50m"
+      delete_timeout = "50m"
+      update_timeout = "50m"
+      user_labels      = { }
     },
   ]
 

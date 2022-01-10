@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "google_compute_network" "vpc" {
-  count                   = var.create_network ? 1 : 0
-  name                    = "${var.name}-vpc"
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "vpc_subnetwork" {
-  count                    = var.create_network ? 1 : 0
-  name                     = "${var.name}-subnetwork"
-  ip_cidr_range            = "${var.vpc_subnet_cidr}"
-  region                   = var.region
-  network                  = google_compute_network.vpc[0].id
-  private_ip_google_access = true
+module "vpc" {
+    source        = "terraform-google-modules/network/google"
+    project_id    = var.project_id
+    count         = var.create_network ? 1 : 0
+    network_name  = "${var.name}-vpc"
+    subnets = [
+    {
+      subnet_name   = "${var.name}-subnetwork"
+      subnet_ip     = "${var.vpc_subnet_cidr}"
+      subnet_region = var.region
+      subnet_private_access = "true"
+    }]
 }
 

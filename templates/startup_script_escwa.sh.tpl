@@ -35,6 +35,9 @@ echo "Downloading setup scripts"
 gsutil cp "${BUCKET_URL}/*" .
 chmod u+x *.sh
 
+#block incoming traffic
+firewall-cmd --zone=public --change-interface=eth0
+
 ./install-license.sh "${LICENSE_FILENAME}"
 ./start-mfds.sh $usernameFull
 ./install-odbc-dsns.sh
@@ -45,12 +48,18 @@ python3 -m pip install requests
 python3 createpac.py "http://localhost:10086" ${REDIS_HOST} ${REGION} ${CLUSTER_PREFIX}-es-mig
 
 ./import-region-bankdemo.sh $usernameFull BankDemo_PAC.zip /home/$usernameFull
+echo "Setting up cloud SQL proxy"
 ./setup-cloudsql-proxy.sh "${SQL_CONNECTION}"
 export MFDBFH_CONFIG=/home/$usernameFull/BankDemo_PAC/System/MFDBFH.cfg
+echo "Creating $MFDBFH_CONFIG"
 ./create-mfdbfh-config.sh $MFDBFH_CONFIG ${SQL_USERNAME} ${SQL_PASSWORD}
+echo "Deploying data files"
 ./deploy-datafiles.sh /home/$usernameFull
-service firewalld stop
 
 #configure ESCWA to secure against active directory
 #empty username uses default CN=MFReader,CN=ADAM Users,CN=Micro Focus,CN=Program Data,DC=local
 python3 secure-escwa.py http://localhost:10086 ${AD_HOST} "" "mf_rdr7_3_1"
+
+#allow remote ESCWA connection
+sudo firewall-cmd --zone=public --add-port=10086/tcp --permanent
+sudo firewall-cmd --reload

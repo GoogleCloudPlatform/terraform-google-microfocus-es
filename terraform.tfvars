@@ -22,7 +22,7 @@ availability_zones = [
 
 bucketname = "jsbucket111"
 
-es_image_project = "artful-reef-327010"
+es_image_project = "microfocus-amcmp-public"
 es_image_name = "es70bankdemo"
 ad_image_name = "adbankdemo"
 escount = 2

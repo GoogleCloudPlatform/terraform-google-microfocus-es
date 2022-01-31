@@ -12,17 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module "vpc" {
-    source        = "terraform-google-modules/network/google"
-    project_id    = var.project_id
-    count         = var.create_network ? 1 : 0
-    network_name  = "${var.name}-vpc"
-    subnets = [
-    {
-      subnet_name   = "${var.name}-subnetwork"
-      subnet_ip     = "${var.vpc_subnet_cidr}"
-      subnet_region = var.region
-      subnet_private_access = "true"
-    }]
+resource "google_redis_instance" "redis" {
+  name           = "${var.name}-redis"
+  tier           = "STANDARD_HA"
+  memory_size_gb = var.redis_memory_size_gb
+  location_id             = var.availability_zones[0]
+  alternative_location_id = var.availability_zones[1]
+  authorized_network = var.create_network ? module.vpc[0].network_name : var.vpc_network 
+  redis_version     = "REDIS_6_X"
+  display_name      = "${var.name}-redis"
+  replica_count     = 1
+  read_replicas_mode = "READ_REPLICAS_ENABLED"
 }
-

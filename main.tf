@@ -15,42 +15,48 @@
 terraform {
   required_providers {
     google = {
-      source  = "hashicorp/google"
-      version = "3.20.0"
+      source  = "hashicorp/google-beta"
+      version = "4.5.0"
     }
   }
 }
 
 provider "google" {
-  credentials = file("terraform.json")
-  project =  var.project
-  region  =  var.region
-  zone    =  var.zone
+  project = var.project_id
+  region  = var.region
+  zone    = var.availability_zones[0]
 }
 
-/*
-locals {
-  blueprint_cluster_master_name = "blueprint-cluster-master"
-  zone    = var.zone == "" ? data.google_compute_zones.available.names[0] : var.zone
-}
-
-
-data "template_file" "blueprint_startup_script" {
-  template = file(format("${path.module}/templates/startup_script.sh.tpl"))
-
+data "template_file" "es_startup_script" {
+  template = file(format("${path.module}/templates/startup_script_es.sh.tpl"))
   vars = {
-    BLUEPRINT_CLUSTER_MASTER_NAME      = local.blueprint_cluster_master_name
-    BLUEPRINT_ADMIN_PASSWORD           = var.blueprint_admin_password
-    BLUEPRINT_CLUSTER_SECRET           = var.blueprint_cluster_secret
-    BLUEPRINT_CM_PRIVATE_IP          = google_compute_address.blueprint_cluster_master_ip.address
+    LICENSE_FILENAME  = var.license_filename
+    BUCKET_URL        = module.storage.bucket.url
+    SQL_CONNECTION    = module.sql-db.instance_connection_name
+    SQL_HOST          = module.sql-db.private_ip_address
+    SQL_USERNAME      = var.pg_db_username
+    SQL_PASSWORD      = var.pg_db_password
   }
-
+    
   depends_on = [
-     google_compute_address.blueprint_cluster_master_ip,
   ]
 }
-*/
 
-data "google_compute_zones" "available" {
-    region = var.region
-blueprint_cluster_master_name}
+data "template_file" "escwa_startup_script" {
+  template = file(format("${path.module}/templates/startup_script_escwa.sh.tpl"))
+  vars = {
+    LICENSE_FILENAME  = var.license_filename
+    BUCKET_URL        = module.storage.bucket.url
+    REDIS_HOST        = google_redis_instance.redis.host #module.memcache.host
+    SQL_CONNECTION    = module.sql-db.instance_connection_name
+    SQL_HOST          = module.sql-db.private_ip_address
+    SQL_USERNAME      = var.pg_db_username
+    SQL_PASSWORD      = var.pg_db_password
+    AD_HOST           = "${var.name}-activedirectory-001"
+    CLUSTER_PREFIX    = var.name
+    REGION            = var.region
+  }
+    
+  depends_on = [
+  ]
+}

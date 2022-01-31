@@ -30,3 +30,25 @@ export LOCAL_IP="$(curl http://metadata.google.internal/computeMetadata/v1/insta
 curl -X PUT --data "in-progress" http://metadata.google.internal/computeMetadata/v1/instance/guest-attributes/blueprint/install -H "Metadata-Flavor: Google"
 
 #Installation steps...
+
+echo "Downloading setup scripts"
+gsutil cp "${BUCKET_URL}/*" .
+chmod u+x *.sh
+
+usernameFull=demouser
+
+./install-license.sh "${LICENSE_FILENAME}"
+./start-mfds.sh $usernameFull
+./import-region-bankdemo.sh $usernameFull BankDemo_PAC.zip /home/$usernameFull
+./setup-cloudsql-proxy.sh "${SQL_CONNECTION}"
+export MFDBFH_CONFIG=/home/$usernameFull/BankDemo_PAC/System/MFDBFH.cfg
+./create-mfdbfh-config.sh $MFDBFH_CONFIG ${SQL_USERNAME} ${SQL_PASSWORD}
+./install-odbc-dsns.sh
+./start-escwa.sh $usernameFull
+./escwa-login.sh
+./escwa-delete-default-directoryserver.sh
+./escwa-add-directoryserver.sh localhost 1086 localhost
+./escwa-set-xadef.sh PG.VSAM /home/demouser/BankDemo_PAC/xa/ESODBCXA64.so ${SQL_USERNAME} ${SQL_PASSWORD}
+
+
+

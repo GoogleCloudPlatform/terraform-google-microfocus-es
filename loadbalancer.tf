@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module "vpc" {
-    source        = "terraform-google-modules/network/google"
-    project_id    = var.project_id
-    count         = var.create_network ? 1 : 0
-    network_name  = "${var.name}-vpc"
-    subnets = [
-    {
-      subnet_name   = "${var.name}-subnetwork"
-      subnet_ip     = "${var.vpc_subnet_cidr}"
-      subnet_region = var.region
-      subnet_private_access = "true"
-    }]
+module "load_balancer" {
+  project      = var.project_id
+  source       = "GoogleCloudPlatform/lb/google"
+  version      = "~> 2.0.0"
+  region       = var.region
+  name         = "${var.name}-loadbalancer"
+  service_port = 5557
+  target_tags  = ["allow-lb-service"]
+  network      = var.create_network ? module.vpc[0].network_name : var.vpc_network
 }
-
